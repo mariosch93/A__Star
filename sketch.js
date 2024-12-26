@@ -1,3 +1,28 @@
+function mousePressed() {
+  // Calculate the grid position of the mouse click
+  let i = floor(mouseX / w);
+  let j = floor(mouseY / h);
+
+  // Ensure the indices are within the grid bounds
+  if (i >= 0 && i < cols && j >= 0 && j < rows) {
+    let clickedSpot = grid[i][j];
+
+    // Check if the clicked spot is not a wall
+    if (!clickedSpot.wall) {
+      // Update the end point
+      end = clickedSpot;
+
+      // Clear previous path, openSet, and closedSet for the new calculation
+      openSet = [];
+      closedSet = [];
+      path = [];
+      openSet.push(start);
+
+      loop(); // Restart the A* visualization
+    }
+  }
+}
+
 function removeFromArray(arr, elt) {
   for (let i = arr.length - 1; i >= 0; i--) {
     if (arr[i] == elt) {
@@ -21,6 +46,7 @@ let start;
 let end;
 let w, h;
 let path = [];
+let endSelected = false; // Flag to track if the end point is chosen
 
 // Βασισμ΄ένοι στην εξίσωση f(x) = g(x) + h(x)
 function Spot(i, j) {
@@ -33,19 +59,18 @@ function Spot(i, j) {
   this.previous = undefined;
   this.wall = false;
 
-  if (random(1) < 0.45) {
+  if (random(1) < 0.25) {
     this.wall = true;
   }
 
   this.show = function (col) {
-    // fill(col);
+    fill(col);
     if (this.wall) {
       fill(0);
-      noStroke();
-      ellipse(this.i * w + w / 2, this.j * h + h / 2, w / 2, h / 2);
     }
-
-    // rect(this.i * w, this.j * h, w - 1, h - 1);
+    noStroke();
+    // ellipse(this.i * w + w / 2, this.j * h + h / 2, w / 2, h / 2);
+    rect(this.i * w, this.j * h, w - 1, h - 1);
   };
 
   this.addNeighbors = function (grid) {
@@ -82,7 +107,8 @@ function Spot(i, j) {
 
 // Δημιουργία του Canvas
 function setup() {
-  createCanvas(600, 600);
+  createCanvas(650, 650);
+  frameRate(5); // Adjust this value for slower or faster updates
 
   w = width / cols;
   h = height / rows;
@@ -114,7 +140,27 @@ function setup() {
 
 // Η function draw κάνει loop ενος animation
 function draw() {
-  //Μπορούμε να συνεχίσουμε την αναζήτηση
+  background(0);
+
+  // Draw the grid
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      grid[i][j].show(color(255));
+    }
+  }
+  if (endSelected && end) {
+    end.show(color(0, 255, 255)); // Cyan for end point
+  }
+  // If end point is not selected, prompt user
+  if (!endSelected) {
+    fill(255, 255, 0);
+    textSize(16);
+    textAlign(CENTER, CENTER);
+    text("Click to select the end point", width / 2, height / 2);
+    return; // Stop execution until end is selected
+  }
+
+  // A* algorithm starts here if the end point is selected
   if (openSet.length > 0) {
     let winner = 0;
     for (let i = 0; i < openSet.length; i++) {
@@ -130,8 +176,6 @@ function draw() {
       console.log("Done!");
     }
 
-    // Αφαιρούμε απο το Array το current αντικείμενο όπου εξερευνήσαμε
-    // και το πάμε στο closedSet
     removeFromArray(openSet, current);
     closedSet.push(current);
 
@@ -140,9 +184,9 @@ function draw() {
       let neighbor = neighbors[i];
 
       if (!closedSet.includes(neighbor) && !neighbor.wall) {
-        let tempG = current.g + 1; //heuristic γείτονας
+        let tempG = current.g + 1;
 
-        var newPath = false;
+        let newPath = false;
         if (openSet.includes(neighbor)) {
           if (tempG < neighbor.g) {
             neighbor.g = tempG;
@@ -162,18 +206,9 @@ function draw() {
       }
     }
   } else {
-    //Δεν υπάρχει λύση
-    console.log("no solution");
+    console.log("No solution");
     noLoop();
     return;
-  }
-
-  background(255);
-
-  for (let i = 0; i < cols; i++) {
-    for (let j = 0; j < rows; j++) {
-      grid[i][j].show(color(255));
-    }
   }
 
   for (let i = 0; i < closedSet.length; i++) {
@@ -193,15 +228,25 @@ function draw() {
   }
 
   for (let i = 0; i < path.length; i++) {
-    // path[i].show(color(0, 0, 255));
+    path[i].show(color(0, 0, 255));
   }
+}
 
-  noFill();
-  stroke(255, 0, 220);
-  strokeWeight(w / 2);
-  beginShape();
-  for (let i = 0; i < path.length; i++) {
-    vertex(path[i].i * w, path[i].j * h + h / 2);
+function mousePressed() {
+  let i = floor(mouseX / w);
+  let j = floor(mouseY / h);
+
+  if (i >= 0 && i < cols && j >= 0 && j < rows) {
+    let clickedSpot = grid[i][j];
+
+    if (!clickedSpot.wall) {
+      end = clickedSpot;
+      endSelected = true; // End point is now selected
+      openSet = [];
+      closedSet = [];
+      path = [];
+      openSet.push(start);
+      loop(); // Restart visualization
+    }
   }
-  endShape();
 }
