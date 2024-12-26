@@ -38,12 +38,14 @@ function Spot(i, j) {
   }
 
   this.show = function (col) {
-    fill(col);
+    // fill(col);
     if (this.wall) {
       fill(0);
+      noStroke();
+      ellipse(this.i * w + w / 2, this.j * h + h / 2, w / 2, h / 2);
     }
-    noStroke();
-    rect(this.i * w, this.j * h, w - 1, h - 1);
+
+    // rect(this.i * w, this.j * h, w - 1, h - 1);
   };
 
   this.addNeighbors = function (grid) {
@@ -138,20 +140,25 @@ function draw() {
       let neighbor = neighbors[i];
 
       if (!closedSet.includes(neighbor) && !neighbor.wall) {
-        let tempG = current.g + 1;
+        let tempG = current.g + 1; //heuristic γείτονας
 
+        var newPath = false;
         if (openSet.includes(neighbor)) {
           if (tempG < neighbor.g) {
             neighbor.g = tempG;
+            newPath = true;
           }
         } else {
           neighbor.g = tempG;
+          newPath = true;
           openSet.push(neighbor);
         }
 
-        neighbor.h = heuristic(neighbor, end);
-        neighbor.f = neighbor.g + neighbor.h;
-        neighbor.previous = current;
+        if (newPath) {
+          neighbor.h = heuristic(neighbor, end);
+          neighbor.f = neighbor.g + neighbor.h;
+          neighbor.previous = current;
+        }
       }
     }
   } else {
@@ -161,7 +168,7 @@ function draw() {
     return;
   }
 
-  background(0);
+  background(255);
 
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
@@ -186,6 +193,15 @@ function draw() {
   }
 
   for (let i = 0; i < path.length; i++) {
-    path[i].show(color(0, 0, 255));
+    // path[i].show(color(0, 0, 255));
   }
+
+  noFill();
+  stroke(255, 0, 220);
+  strokeWeight(w / 2);
+  beginShape();
+  for (let i = 0; i < path.length; i++) {
+    vertex(path[i].i * w, path[i].j * h + h / 2);
+  }
+  endShape();
 }
