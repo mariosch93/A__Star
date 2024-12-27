@@ -107,7 +107,7 @@ function Spot(i, j) {
 
 // Δημιουργία του Canvas
 function setup() {
-  createCanvas(650, 650);
+  createCanvas(600, 600);
   frameRate(5); // Adjust this value for slower or faster updates
 
   w = width / cols;
