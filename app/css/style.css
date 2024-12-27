@@ -1,0 +1,50 @@
+html,
+body {
+  margin: 0;
+  padding: 5px;
+  line-height: 1.5;
+}
+
+canvas {
+  display: block;
+}
+
+iframe {
+  border: 3px solid black;
+  width: 670px;
+  height: 700px; /* Adjust as needed */
+  border-radius: 1%;
+}
+
+#initializeButton {
+  border: 0px;
+  background-color: transparent;
+  font-size: 1.5rem;
+  color: rgb(179, 28, 199);
+  font-family: cursive;
+  text-shadow: 2px 2px 4px #8b8b8bc5;
+  font-weight: 700;
+}
+
+#initializeButton:hover,
+#updateGrid:hover {
+  /* border: 2px solid gray; */
+  border-radius: 10px;
+  background-color: rgba(1, 169, 169, 0.32);
+  color: rgb(173, 11, 173) 0.9;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.9);
+  animation: fadeInAnimation 400ms ease-out;
+}
+@keyframes fadeInAnimation {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}

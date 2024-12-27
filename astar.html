@@ -4,62 +4,66 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>A* Visualization</title>
-    <script src="libraries/p5.min.js"></script>
-    <script src="libraries/p5.sound.min.js"></script>
+    <!-- Load p5.js and p5.sound.js -->
+    <script src="./libraries/js/p5.min.js"></script>
+    <script src="./libraries/js/p5.sound.min.js"></script>
+    <link rel="stylesheet" href="./libraries/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./app/css/style.css" />
   </head>
   <body>
+    <div class="d-flex flex-row justify-content-between">
+      <div>
+        Choose Wall Percentage: <span id="wallPercentageValue">25%</span>
+        <input
+          title="wallSlider"
+          type="range"
+          id="wallSlider"
+          min="0"
+          max="100"
+          value="25"
+          step="1"
+        />
+      </div>
+      <button id="initializeButton">Renew Grid</button>
+      <!-- Button to reinitialize the grid -->
+    </div>
+
     <script>
-      function mousePressed() {
-        // Calculate the grid position of the mouse click
-        let i = floor(mouseX / w);
-        let j = floor(mouseY / h);
-
-        // Ensure the indices are within the grid bounds
-        if (i >= 0 && i < cols && j >= 0 && j < rows) {
-          let clickedSpot = grid[i][j];
-
-          // Check if the clicked spot is not a wall
-          if (!clickedSpot.wall) {
-            // Update the end point
-            end = clickedSpot;
-
-            // Clear previous path, openSet, and closedSet for the new calculation
-            openSet = [];
-            closedSet = [];
-            path = [];
-            openSet.push(start);
-
-            loop(); // Restart the A* visualization
-          }
+      // Helper function to remove an item from an array
+      function removeFromArray(arr, item) {
+        const index = arr.indexOf(item);
+        if (index > -1) {
+          arr.splice(index, 1);
         }
       }
 
-      function removeFromArray(arr, elt) {
-        for (let i = arr.length - 1; i >= 0; i--) {
-          if (arr[i] == elt) {
-            arr.splice(i, 1);
-          }
-        }
-      }
-
-      function heuristic(a, b) {
-        let d = abs(a.i - b.i) + abs(a.j - b.j);
-        return d;
-      }
-
-      let cols = 40;
-      let rows = 40;
+      let cols = 30;
+      let rows = 30;
       let grid = new Array(cols);
-
-      let openSet = []; //εδώ μπαίνουν οι πιθανές επιλογές αναζήτησης
-      let closedSet = []; //εδώ μπαίνουν οι επιλογές όπου έχουν ήδη εξεταστεί
+      let openSet = [];
+      let closedSet = [];
       let start;
       let end;
       let w, h;
       let path = [];
-      let endSelected = false; // Flag to track if the end point is chosen
+      let endSelected = false;
+      let gridInitialized = false; // Flag to track grid initialization
+      let wallPercentage = 0.25;
 
-      // Βασισμ΄ένοι στην εξίσωση f(x) = g(x) + h(x)
+      // Listen for messages from parent window
+      window.addEventListener("message", function (event) {
+        const data = event.data;
+        if (data.action === "updateWallPercentage") {
+          wallPercentage = data.value; // Update wall percentage
+          resetGrid(); // Reset the grid with the new wall percentage
+        } else if (data.action === "updateGridSize") {
+          cols = data.cols; // Update columns
+          rows = data.rows; // Update rows
+          resetGrid(); // Reset the grid with the new size
+        }
+      });
+
+      // Spot constructor
       function Spot(i, j) {
         this.i = i;
         this.j = j;
@@ -70,7 +74,7 @@
         this.previous = undefined;
         this.wall = false;
 
-        if (random(1) < 0.25) {
+        if (random(1) < wallPercentage) {
           this.wall = true;
         }
 
@@ -80,54 +84,63 @@
             fill(0);
           }
           noStroke();
-          // ellipse(this.i * w + w / 2, this.j * h + h / 2, w / 2, h / 2);
           rect(this.i * w, this.j * h, w - 1, h - 1);
         };
 
         this.addNeighbors = function (grid) {
           let i = this.i;
           let j = this.j;
-          if (i < cols - 1) {
-            // Βλέπουμε αν το i είναι στη γωνία
-            this.neighbors.push(grid[i + 1][j]);
-          }
-          if (i > 0) {
-            this.neighbors.push(grid[i - 1][j]);
-          }
-          if (j < rows - 1) {
-            this.neighbors.push(grid[i][j + 1]);
-          }
-          if (j > 0) {
-            this.neighbors.push(grid[i][j - 1]);
-          }
-          // Για διαφώνια κίνηση
-          if (i > 0 && j > 0) {
-            this.neighbors.push(grid[i - 1][j - 1]);
-          }
-          if (i < cols - 1 && j > 0) {
-            this.neighbors.push(grid[i + 1][j - 1]);
-          }
-          if (i > 0 && j < rows - 1) {
-            this.neighbors.push(grid[i - 1][j + 1]);
-          }
-          if (i < cols - 1 && j < rows - 1) {
+          if (i < cols - 1) this.neighbors.push(grid[i + 1][j]);
+          if (i > 0) this.neighbors.push(grid[i - 1][j]);
+          if (j < rows - 1) this.neighbors.push(grid[i][j + 1]);
+          if (j > 0) this.neighbors.push(grid[i][j - 1]);
+          if (i > 0 && j > 0) this.neighbors.push(grid[i - 1][j - 1]);
+          if (i < cols - 1 && j > 0) this.neighbors.push(grid[i + 1][j - 1]);
+          if (i > 0 && j < rows - 1) this.neighbors.push(grid[i - 1][j + 1]);
+          if (i < cols - 1 && j < rows - 1)
             this.neighbors.push(grid[i + 1][j + 1]);
-          }
         };
       }
 
-      // Δημιουργία του Canvas
+      // Setup the canvas and grid
       function setup() {
         createCanvas(650, 650);
-        frameRate(5); // Adjust this value for slower or faster updates
+        frameRate(5);
 
+        // Recalculate cell width and height when the grid changes
         w = width / cols;
         h = height / rows;
 
-        // Φτιάχνουμε ένα 2D Array
+        // Initialize grid
+        resetGrid();
+
+        // Add event listener for wall slider after p5.js setup
+        document
+          .getElementById("wallSlider")
+          .addEventListener("input", function () {
+            wallPercentage = this.value / 100; // Convert slider value to percentage
+            document.getElementById(
+              "wallPercentageValue"
+            ).innerText = `${this.value}%`; // Update displayed value
+            resetGrid(); // Reinitialize grid with new wall percentage
+          });
+
+        // Event listener for initializing the grid
+        document
+          .getElementById("initializeButton")
+          .addEventListener("click", resetGrid);
+      }
+
+      // Reset grid with the new wall percentage and grid size
+      function resetGrid() {
+        grid = new Array(cols);
         for (let i = 0; i < cols; i++) {
           grid[i] = new Array(rows);
         }
+
+        // Recalculate cell width and height
+        w = width / cols;
+        h = height / rows;
 
         for (let i = 0; i < cols; i++) {
           for (let j = 0; j < rows; j++) {
@@ -146,10 +159,23 @@
         start.wall = false;
         end.wall = false;
 
-        openSet.push(start);
+        openSet = [start];
+        closedSet = [];
+        path = [];
+
+        gridInitialized = true; // Mark the grid as initialized
+        endSelected = false; // Ensure end point is not selected after reset
+
+        loop(); // Restart the A* algorithm when grid is reset
       }
 
-      // Η function draw κάνει loop ενος animation
+      // Heuristic function for A* algorithm
+      function heuristic(a, b) {
+        let d = abs(a.i - b.i) + abs(a.j - b.j);
+        return d;
+      }
+
+      // Draw function for A* visualization
       function draw() {
         background(0);
 
@@ -159,18 +185,20 @@
             grid[i][j].show(color(255));
           }
         }
-        if (endSelected && end) {
-          end.show(color(0, 255, 255)); // Cyan for end point
+
+        if (end) {
+          end.show(color(0, 255, 255)); // Cyan for the end point
         }
-        // If end point is not selected, prompt user
+
+        // If the end point is not selected, stop the algorithm
         if (!endSelected) {
           fill(255, 255, 0);
 
-          return; // Stop execution until end is selected
+          return; // Stop execution until the end point is selected
         }
 
-        // A* algorithm starts here if the end point is selected
-        if (openSet.length > 0) {
+        // A* algorithm starts here if the end point is selected and grid is initialized
+        if (gridInitialized && openSet.length > 0) {
           let winner = 0;
           for (let i = 0; i < openSet.length; i++) {
             if (openSet[i].f < openSet[winner].f) {
@@ -220,6 +248,7 @@
           return;
         }
 
+        // Show visited and path points
         for (let i = 0; i < closedSet.length; i++) {
           closedSet[i].show(color(255, 0, 0));
         }
@@ -241,6 +270,7 @@
         }
       }
 
+      // Mouse pressed function to set end point
       function mousePressed() {
         let i = floor(mouseX / w);
         let j = floor(mouseY / h);
@@ -250,15 +280,18 @@
 
           if (!clickedSpot.wall) {
             end = clickedSpot;
-            endSelected = true; // End point is now selected
+            endSelected = true;
             openSet = [];
             closedSet = [];
             path = [];
             openSet.push(start);
-            loop(); // Restart visualization
+            loop();
           }
         }
       }
+
+      // Initialize grid when page loads
+      window.onload = resetGrid;
     </script>
   </body>
 </html>
