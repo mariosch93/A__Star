@@ -9,8 +9,9 @@ body {
 } */
 
 iframe {
-  border: 1px solid black;
-  padding: 10px 10px;
-  width: 600px;
-  height: 600px; /* Adjust as needed */
+  border: 3px solid black;
+  margin: 0;
+  width: 650px;
+  height: 650px; /* Adjust as needed */
+  border-radius: 1%;
 }

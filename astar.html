@@ -47,8 +47,8 @@
         return d;
       }
 
-      let cols = 50;
-      let rows = 50;
+      let cols = 40;
+      let rows = 40;
       let grid = new Array(cols);
 
       let openSet = []; //εδώ μπαίνουν οι πιθανές επιλογές αναζήτησης
@@ -165,9 +165,7 @@
         // If end point is not selected, prompt user
         if (!endSelected) {
           fill(255, 255, 0);
-          textSize(16);
-          textAlign(CENTER, CENTER);
-          text("Click to select the end point", width / 2, height / 2);
+
           return; // Stop execution until end is selected
         }
 
