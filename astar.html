@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>A* Visualization</title>
-    <!-- Load p5.js and p5.sound.js -->
     <script src="./libraries/js/p5.min.js"></script>
     <script src="./libraries/js/p5.sound.min.js"></script>
     <link rel="stylesheet" href="./libraries/css/bootstrap.min.css" />
@@ -24,8 +23,13 @@
           step="1"
         />
       </div>
-      <button id="initializeButton">Generate new Grid</button>
-      <!-- Button to reinitialize the grid -->
+      <button id="initializeButton">
+        <h1>A STAR</h1>
+        Generate new Grid
+      </button>
+      <label>
+        <input type="checkbox" id="diagonalToggle" /> Allow Diagonal Movement
+      </label>
     </div>
 
     <script>
@@ -49,19 +53,7 @@
       let endSelected = false;
       let gridInitialized = false; // Flag to track grid initialization
       let wallPercentage = 0.25;
-
-      // Listen for messages from parent window
-      window.addEventListener("message", function (event) {
-        const data = event.data;
-        if (data.action === "updateWallPercentage") {
-          wallPercentage = data.value; // Update wall percentage
-          resetGrid(); // Reset the grid with the new wall percentage
-        } else if (data.action === "updateGridSize") {
-          cols = data.cols; // Update columns
-          rows = data.rows; // Update rows
-          resetGrid(); // Reset the grid with the new size
-        }
-      });
+      let allowDiagonal = false; // Default diagonal movement is off
 
       // Spot constructor
       function Spot(i, j) {
@@ -90,21 +82,70 @@
         this.addNeighbors = function (grid) {
           let i = this.i;
           let j = this.j;
+
+          // Add orthogonal neighbors
           if (i < cols - 1) this.neighbors.push(grid[i + 1][j]);
           if (i > 0) this.neighbors.push(grid[i - 1][j]);
           if (j < rows - 1) this.neighbors.push(grid[i][j + 1]);
           if (j > 0) this.neighbors.push(grid[i][j - 1]);
-          if (i > 0 && j > 0) this.neighbors.push(grid[i - 1][j - 1]);
-          if (i < cols - 1 && j > 0) this.neighbors.push(grid[i + 1][j - 1]);
-          if (i > 0 && j < rows - 1) this.neighbors.push(grid[i - 1][j + 1]);
-          if (i < cols - 1 && j < rows - 1)
-            this.neighbors.push(grid[i + 1][j + 1]);
+
+          // Add diagonal neighbors if diagonal movement is allowed
+          if (allowDiagonal) {
+            if (i > 0 && j > 0) this.neighbors.push(grid[i - 1][j - 1]);
+            if (i < cols - 1 && j > 0) this.neighbors.push(grid[i + 1][j - 1]);
+            if (i > 0 && j < rows - 1) this.neighbors.push(grid[i - 1][j + 1]);
+            if (i < cols - 1 && j < rows - 1)
+              this.neighbors.push(grid[i + 1][j + 1]);
+          }
         };
       }
 
+      function initializeGrid() {
+        grid = new Array(cols).fill().map(() => new Array(rows));
+        for (let i = 0; i < cols; i++) {
+          for (let j = 0; j < rows; j++) {
+            grid[i][j] = new Spot(i, j);
+          }
+        }
+        for (let i = 0; i < cols; i++) {
+          for (let j = 0; j < rows; j++) {
+            grid[i][j].addNeighbors(grid); // Neighbors respect allowDiagonal
+          }
+        }
+
+        start = grid[0][0];
+        end = grid[cols - 1][rows - 1];
+        start.wall = false;
+        end.wall = false;
+
+        stack = [start];
+        visited = [];
+        path = [];
+        dfsFinished = false;
+        endSelected = false;
+
+        loop();
+      }
+
+      // function resizeCanvasToFit() {
+      //   // Get the parent window size (for iframes or window resizing)
+      //   const canvasWidth = window.innerWidth;
+      //   const canvasHeight = window.innerHeight;
+
+      //   // Resize the canvas
+      //   resizeCanvas(canvasWidth, canvasHeight);
+
+      //   // Update the cell width and height based on the new canvas size
+      //   w = width / cols;
+      //   h = height / rows;
+
+      //   initializeGrid(); // Reinitialize grid based on new canvas size
+      // }
+
       // Setup the canvas and grid
       function setup() {
-        createCanvas(650, 650);
+        createCanvas(750, 750); // Initial canvas size
+        // resizeCanvasToFit(); // Resize canvas to fit the window size
         frameRate(5);
 
         // Recalculate cell width and height when the grid changes
@@ -129,7 +170,25 @@
         document
           .getElementById("initializeButton")
           .addEventListener("click", resetGrid);
+
+        // Diagonal toggle
+        const diagonalToggle = document.getElementById("diagonalToggle");
+        diagonalToggle.addEventListener("change", () => {
+          allowDiagonal = diagonalToggle.checked; // Toggle diagonal movement
+          resetGrid(); // Reinitialize grid to apply changes
+        });
       }
+
+      // Listen for grid size change from parent (index.html)
+      window.addEventListener("message", function (event) {
+        const data = event.data;
+
+        if (data.action === "updateGridSize") {
+          rows = data.rows;
+          cols = data.cols;
+          resetGrid(); // Reset the grid with new size
+        }
+      });
 
       // Reset grid with the new wall percentage and grid size
       function resetGrid() {
@@ -150,7 +209,7 @@
 
         for (let i = 0; i < cols; i++) {
           for (let j = 0; j < rows; j++) {
-            grid[i][j].addNeighbors(grid);
+            grid[i][j].addNeighbors(grid); // Add neighbors based on diagonal toggle
           }
         }
 
@@ -193,7 +252,6 @@
         // If the end point is not selected, stop the algorithm
         if (!endSelected) {
           fill(255, 255, 0);
-
           return; // Stop execution until the end point is selected
         }
 

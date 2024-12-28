@@ -9,11 +9,18 @@ canvas {
   display: block;
 }
 
-iframe {
-  border: 3px solid black;
-  width: 670px;
-  height: 700px; /* Adjust as needed */
+#iframe-container {
+  border: 2px dashed black;
+  padding: 1px;
+  width: 780px;
+  height: 860px; /* Adjust as needed */
   border-radius: 1%;
+}
+
+#astarFrame,
+#dfsFrame {
+  width: 100%; /* Make iframe responsive */
+  height: 100%; /* Make iframe responsive */
 }
 
 input[type="number"] {
