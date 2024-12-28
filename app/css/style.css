@@ -16,7 +16,20 @@ iframe {
   border-radius: 1%;
 }
 
-#initializeButton {
+input[type="number"] {
+  border-radius: 50%;
+  border: 2px solid #00334c;
+  background-color: #8b8b8b78;
+  color: #066aff;
+  text-align: center;
+  font-size: larger;
+  font-weight: bold;
+  width: 60px;
+  height: 60px;
+}
+
+#initializeButton,
+#updateGrid {
   border: 0px;
   background-color: transparent;
   font-size: 1.5rem;
@@ -24,6 +37,9 @@ iframe {
   font-family: cursive;
   text-shadow: 2px 2px 4px #8b8b8bc5;
   font-weight: 700;
+  border: 1px solid black;
+  border-radius: 15%;
+  width: fit-content;
 }
 
 #initializeButton:hover,
