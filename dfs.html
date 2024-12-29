@@ -6,6 +6,8 @@
     <title>DFS Visualization</title>
     <script src="./libraries/js/p5.min.js"></script>
     <script src="./libraries/js/p5.sound.min.js"></script>
+    <script src="./app/js/dfsFuntions.js"></script>
+    <script src="./app/js/spot.js"></script>
   </head>
   <body>
     <h3>Wall Percentage: <span id="wallPercentageValue">25%</span></h3>
@@ -17,8 +19,8 @@
     </label>
 
     <script>
-      let cols = 30; // Default columns
-      let rows = 30; // Default rows
+      let cols = 15;
+      let rows = 15;
       let grid = [];
       let stack = [];
       let visited = [];
@@ -30,212 +32,19 @@
       let endSelected = false;
       let dfsFinished = false;
 
-      // Spot constructor
-      function Spot(i, j) {
-        this.i = i;
-        this.j = j;
-        this.neighbors = [];
-        this.previous = undefined;
-        this.wall = random(1) < wallPercentage;
-
-        this.show = function (col) {
-          fill(col);
-          if (this.wall) {
-            fill(0);
-          }
-          noStroke();
-          rect(this.i * w, this.j * h, w - 1, h - 1);
-        };
-
-        this.addNeighbors = function (grid) {
-          this.neighbors = [];
-          let i = this.i;
-          let j = this.j;
-
-          // Add orthogonal neighbors
-          if (i < cols - 1) this.neighbors.push(grid[i + 1][j]);
-          if (i > 0) this.neighbors.push(grid[i - 1][j]);
-          if (j < rows - 1) this.neighbors.push(grid[i][j + 1]);
-          if (j > 0) this.neighbors.push(grid[i][j - 1]);
-
-          // Add diagonal neighbors if toggled on
-          if (allowDiagonal) {
-            if (i > 0 && j > 0) this.neighbors.push(grid[i - 1][j - 1]);
-            if (i < cols - 1 && j > 0) this.neighbors.push(grid[i + 1][j - 1]);
-            if (i > 0 && j < rows - 1) this.neighbors.push(grid[i - 1][j + 1]);
-            if (i < cols - 1 && j < rows - 1)
-              this.neighbors.push(grid[i + 1][j + 1]);
-          }
-        };
-      }
-
-      // Iterative DFS
-      function dfsIterative() {
-        if (stack.length > 0 && !dfsFinished) {
-          let current = stack.pop();
-          visited.push(current);
-
-          if (current === end) {
-            dfsFinished = true;
-            console.log("Path found!");
-            reconstructPath();
-            noLoop();
-          }
-
-          current.show(color(0, 255, 0));
-
-          for (let neighbor of current.neighbors) {
-            if (!visited.includes(neighbor) && !neighbor.wall) {
-              stack.push(neighbor);
-              neighbor.previous = current;
-            }
-          }
-        } else {
-          noLoop();
-          if (!dfsFinished) {
-            console.log("No solution found!");
-          }
-        }
-      }
-
-      // Reconstruct path
-      function reconstructPath() {
-        path = [];
-        let temp = end;
-        while (temp) {
-          path.push(temp);
-          temp = temp.previous;
-        }
-        for (let p of path) {
-          p.show(color(0, 0, 255)); // Blue for path
-        }
-      }
-
-      // Initialize grid
-      function initializeGrid() {
-        grid = new Array(cols).fill().map(() => new Array(rows));
-        for (let i = 0; i < cols; i++) {
-          for (let j = 0; j < rows; j++) {
-            grid[i][j] = new Spot(i, j);
-          }
-        }
-        for (let i = 0; i < cols; i++) {
-          for (let j = 0; j < rows; j++) {
-            grid[i][j].addNeighbors(grid); // Neighbors respect allowDiagonal
-          }
-        }
-
-        start = grid[0][0];
-        end = grid[cols - 1][rows - 1];
-        start.wall = false;
-        end.wall = false;
-
-        stack = [start];
-        visited = [];
-        path = [];
-        dfsFinished = false;
-        endSelected = false;
-
-        w = width / cols;
-        h = height / rows;
-
-        loop();
-      }
-
-      // Resize canvas dynamically based on the window or iframe size
-      function resizeCanvasToFit() {
-        // Get the parent window size (for iframes or window resizing)
-        const canvasWidth = window.innerWidth;
-        const canvasHeight = window.innerHeight;
-
-        // Resize the canvas
-        resizeCanvas(canvasWidth, canvasHeight);
-
-        // Update the cell width and height based on the new canvas size
-        w = width / cols;
-        h = height / rows;
-
-        initializeGrid(); // Reinitialize grid based on new canvas size
-      }
-
-      // Setup function
-      function setup() {
-        createCanvas(window.innerWidth, window.innerHeight); // Initial canvas size
-        resizeCanvasToFit(); // Resize canvas to fit the window size
-
-        // Wall percentage slider
-        document.getElementById("wallSlider").addEventListener("input", (e) => {
-          wallPercentage = e.target.value / 100;
-          document.getElementById(
-            "wallPercentageValue"
-          ).textContent = `${e.target.value}%`;
-          initializeGrid();
-        });
-
-        // Reinitialize grid button
-        document
-          .getElementById("initializeButton")
-          .addEventListener("click", initializeGrid);
-
-        // Diagonal toggle
-        const diagonalToggleElement = document.getElementById("diagonalToggle");
-        diagonalToggleElement.checked = allowDiagonal; // Set the checkbox to match allowDiagonal
-        diagonalToggleElement.addEventListener("change", (e) => {
-          allowDiagonal = e.target.checked;
-          initializeGrid(); // Reinitialize grid to update neighbors
-        });
-      }
-
-      // Draw function
-      function draw() {
-        background(0);
-        for (let i = 0; i < cols; i++) {
-          for (let j = 0; j < rows; j++) {
-            grid[i][j].show(color(255));
-          }
-        }
-        frameRate(5);
-
-        if (endSelected) {
-          end.show(color(0, 255, 255)); // Cyan for end point
-          dfsIterative();
-        }
-      }
-
-      // Mouse pressed function to select end point
-      function mousePressed() {
-        let i = floor(mouseX / w);
-        let j = floor(mouseY / h);
-
-        if (i >= 0 && i < cols && j >= 0 && j < rows) {
-          let clickedSpot = grid[i][j];
-
-          if (!clickedSpot.wall) {
-            // Reset the DFS and path search when a new endpoint is selected
-            end = clickedSpot;
-            endSelected = true;
-            stack = [start];
-            visited = [];
-            path = [];
-            dfsFinished = false;
-            loop(); // Restart the visualization
-          }
-        }
-      }
-
       // Listen for grid size changes from parent (index.html)
       window.addEventListener("message", (event) => {
-        const { cols: newCols, rows: newRows } = event.data;
+        const data = event.data;
 
-        if (newCols !== undefined && newRows !== undefined) {
-          cols = parseInt(newCols, 10);
-          rows = parseInt(newRows, 10);
-          resizeCanvasToFit(); // Recalculate the canvas size based on new grid size
+        if (data.action === "updateGridSize") {
+          rows = data.rows;
+          cols = data.cols;
+          initializeGrid();
         }
       });
 
-      // Listen for window resizing to adjust the canvas size
-      window.addEventListener("resize", resizeCanvasToFit);
+      // Initialize grid when page loads
+      window.onload = initializeGrid;
     </script>
   </body>
 </html>

@@ -1,15 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const astarIframe = document.getElementById("astarFrame"); // Correct ID
-  const dfsIframe = document.getElementById("dfsFrame"); // Correct ID
-
+  const astarIframe = document.getElementById("astarFrame");
+  const dfsIframe = document.getElementById("dfsFrame");
   const colsInput = document.getElementById("cols");
   const rowsInput = document.getElementById("rows");
   const updateButton = document.getElementById("updateGrid");
-  const diagonalToggle = document.getElementById("diagonalToggle");
-
-  // Set default state for diagonal toggle
-  const allowDiagonalDefault = false; // Ensure diagonal is off by default
-  diagonalToggle.checked = allowDiagonalDefault;
 
   // Function to send a message to the iframe
   function sendMessageToIframe(iframe, message) {
@@ -25,28 +19,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     sendMessageToIframe(astarIframe, { action: "updateGridSize", cols, rows });
     sendMessageToIframe(dfsIframe, { action: "updateGridSize", cols, rows });
-  });
-
-  // Toggle diagonal movement
-  diagonalToggle.addEventListener("change", () => {
-    const allowDiagonal = diagonalToggle.checked;
-
-    sendMessageToIframe(astarIframe, {
-      action: "toggleDiagonal",
-      allowDiagonal,
-    });
-    sendMessageToIframe(dfsIframe, { action: "toggleDiagonal", allowDiagonal }); // Corrected
-
-    console.log("Diagonal movement set to:", allowDiagonal);
-  });
-
-  // Initialize the diagonal toggle state
-  sendMessageToIframe(astarIframe, {
-    action: "toggleDiagonal",
-    allowDiagonal: allowDiagonalDefault,
-  });
-  sendMessageToIframe(dfsIframe, {
-    action: "toggleDiagonal",
-    allowDiagonal: allowDiagonalDefault,
   });
 });

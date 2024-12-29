@@ -10,10 +10,10 @@ canvas {
 }
 
 #iframe-container {
-  border: 2px dashed black;
+  /* border: 2px dashed black; */
   padding: 1px;
-  width: 780px;
-  height: 860px; /* Adjust as needed */
+  width: 900px;
+  height: 900px; /* Adjust as needed */
   border-radius: 1%;
 }
 
@@ -44,7 +44,7 @@ input[type="number"] {
   font-family: cursive;
   text-shadow: 2px 2px 4px #8b8b8bc5;
   font-weight: 700;
-  border: 1px solid black;
+  /* border: 1px solid black; */
   border-radius: 15%;
   width: fit-content;
 }
