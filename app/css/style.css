@@ -9,11 +9,12 @@ canvas {
   display: block;
 }
 
-#iframe-container {
+#astar-container,
+#dfs-container {
   /* border: 2px dashed black; */
   padding: 1px;
-  width: 900px;
-  height: 900px; /* Adjust as needed */
+  width: 800px;
+  height: 800px; /* Adjust as needed */
   border-radius: 1%;
 }
 

@@ -6,6 +6,13 @@
     <title>Main Page</title>
     <link rel="stylesheet" href="./libraries/css/bootstrap.min.css" />
     <link rel="stylesheet" href="./app/css/style.css" />
+    <!-- Javascript files -->
+    <script src="./libraries/js/p5.min.js"></script>
+    <script src="./libraries/js/p5.sound.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script src="./app/js/controls.js"></script>
   </head>
   <body>
     <main>
@@ -18,28 +25,42 @@
           <input id="rows" type="number" value="30" min="10" max="100" />
           <button id="updateGrid">Update Grid</button>
         </div>
-
-        <div id="iframe-container">
-          <iframe
-            id="astarFrame"
-            title="A* Visualization"
-            src="./astar.html"
-          ></iframe>
-          <iframe
-            id="dfsFrame"
-            title="DFS Visualization"
-            src="./dfs.html"
-          ></iframe>
-        </div>
+        <button id="revealAstar">Toggle A* iFrame</button>
+        <button id="revealDfs">Toggle A* iFrame</button>
       </div>
-    </main>
+      <div id="astar-container">
+        <iframe
+          id="astarFrame"
+          title="A* Visualization"
+          src="./astar.html"
+          class=""
+        ></iframe>
+      </div>
 
-    <!-- Javascript files -->
-    <script src="./libraries/js/p5.min.js"></script>
-    <script src="./libraries/js/p5.sound.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
-    <script src="./app/js/controls.js"></script>
+      <div id="dfs-container">
+        <iframe
+          id="dfsFrame"
+          title="DFS Visualization"
+          src="./dfs.html"
+        ></iframe>
+      </div>
+
+      <script>
+        const buttonAstar = false;
+        const buttonDfs = false;
+
+        $(document).ready(function () {
+          $("#revealAstar").on("click", function () {
+            // Toggle visibility by toggling the class
+            $("#astar-container").toggleClass("d-none");
+          });
+
+          $("#revealDfs").on("click", function () {
+            // Toggle visibility by toggling the class
+            $("#dfs-container").toggleClass("d-none");
+          });
+        });
+      </script>
+    </main>
   </body>
 </html>

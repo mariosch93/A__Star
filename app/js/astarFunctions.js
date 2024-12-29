@@ -66,7 +66,7 @@ function removeFromArray(arr, item) {
 }
 
 function setup() {
-  createCanvas(750, 750); // Initial canvas size
+  createCanvas(650, 650); // Initial canvas size
   frameRate(5);
   w = width / cols;
   h = height / rows;
