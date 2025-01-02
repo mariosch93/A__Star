@@ -14,24 +14,23 @@
   </head>
 
   <body>
-    <div class="d-flex flex-row justify-content-between">
-      <div>
-        Choose Wall Percentage: <span id="wallPercentageValue">25%</span>
-        <input
-          title="wallSlider"
-          type="range"
-          id="wallSlider"
-          min="0"
-          max="100"
-          value="25"
-          step="1"
-        />
-      </div>
+    <h2>A* Algorithm</h2>
+    <div class="d-flex flex-row justify-content-around">
+      Wall Percentage: <span id="wallPercentageValue">25%</span>
+      <input
+        title="wallSlider"
+        type="range"
+        id="wallSlider"
+        min="0"
+        max="100"
+        value="25"
+        step="1"
+      />
       <button id="initializeButton">
         <h5>Generate new Grid</h5>
       </button>
-      <label>
-        <input type="checkbox" id="diagonalToggle" /> Allow Diagonal Movement
+      <label for="diagonalToggle"
+        >Diagonal Movement <input type="checkbox" id="diagonalToggle" />
       </label>
     </div>
 

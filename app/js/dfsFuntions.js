@@ -114,7 +114,7 @@ function reconstructPath() {
 
 // Setup function
 function setup() {
-  createCanvas(650, 650);
+  createCanvas(720, 550);
   frameRate(5);
   w = width / cols;
   h = height / rows;

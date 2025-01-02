@@ -8,15 +8,31 @@
     <script src="./libraries/js/p5.sound.min.js"></script>
     <script src="./app/js/dfsFuntions.js"></script>
     <script src="./app/js/spot.js"></script>
+    <link rel="stylesheet" href="./libraries/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./app/css/style.css" />
   </head>
   <body>
-    <h3>Wall Percentage: <span id="wallPercentageValue">25%</span></h3>
-    <input type="range" id="wallSlider" min="0" max="100" value="25" step="1" />
-    <label for="wallSlider">Choose Wall Percentage</label>
-    <button id="initializeButton">Initialize Grid</button>
-    <label>
-      <input type="checkbox" id="diagonalToggle" /> Allow Diagonal Movement
-    </label>
+    <h2>Depth First Search Algorithm</h2>
+    <div class="d-flex flex-row justify-content-between">
+      <div>
+        Wall Percentage: <span id="wallPercentageValue">25%</span>
+        <input
+          title="wallSlider"
+          type="range"
+          id="wallSlider"
+          min="0"
+          max="100"
+          value="25"
+          step="1"
+        />
+      </div>
+      <button id="initializeButton">
+        <h5>Generate new Grid</h5>
+      </button>
+      <label>
+        Diagonal Movement <input type="checkbox" id="diagonalToggle" />
+      </label>
+    </div>
 
     <script>
       let cols = 15;
