@@ -20,4 +20,15 @@ document.addEventListener("DOMContentLoaded", () => {
     sendMessageToIframe(astarIframe, { action: "updateGridSize", cols, rows });
     sendMessageToIframe(dfsIframe, { action: "updateGridSize", cols, rows });
   });
+
+  // Listen for messages from iframe
+  window.addEventListener("message", function (event) {
+    const data = event.data;
+
+    if (data.action === "updateSummary") {
+      const summary = document.getElementById("summary");
+      summary.value = ""; // Clear the textarea
+      summary.value += data.text + "\n"; // Add the new message
+    }
+  });
 });

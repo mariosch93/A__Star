@@ -41,7 +41,7 @@ function dfsIterative() {
 
     if (current === end) {
       dfsFinished = true;
-      console.log("Path found!");
+      addText("Algorithm completed successfully!");
       reconstructPath();
       noLoop();
     }
@@ -57,7 +57,7 @@ function dfsIterative() {
   } else {
     noLoop();
     if (!dfsFinished) {
-      console.log("No solution found!");
+      addText("No solution!");
     }
   }
 }
@@ -140,4 +140,7 @@ function setup() {
     allowDiagonal = e.target.checked;
     initializeGrid(); // Reinitialize grid to update neighbors
   });
+}
+function addText(result) {
+  window.parent.postMessage({ action: "updateSummary", text: result }, "*");
 }

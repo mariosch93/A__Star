@@ -125,7 +125,7 @@ function draw() {
 
     if (current === end) {
       noLoop();
-      console.log("Done!");
+      addText("Algorithm completed successfully!");
     }
 
     removeFromArray(openSet, current);
@@ -158,7 +158,7 @@ function draw() {
       }
     }
   } else {
-    console.log("No solution");
+    addText("No solution!");
     noLoop();
     return;
   }
@@ -189,4 +189,8 @@ function draw() {
 function heuristic(a, b) {
   let d = abs(a.i - b.i) + abs(a.j - b.j);
   return d;
+}
+
+function addText(result) {
+  window.parent.postMessage({ action: "updateSummary", text: result }, "*");
 }
