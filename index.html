@@ -55,10 +55,22 @@
                 </button>
               </div>
               <div class="col">
-                <button id="revealAstar">A* Algorithm</button>
+                <input
+                  id="revealAstar"
+                  title="Astar"
+                  name="Alg_Option"
+                  type="radio"
+                />
+                <label for="Astar">A* Algorithm</label>
               </div>
               <div class="col">
-                <button id="revealDfs">Depth First Search</button>
+                <input
+                  id="revealDfs"
+                  title="Dfs"
+                  name="Alg_Option"
+                  type="radio"
+                />
+                <label for="Dfs">Depth First Search</label>
               </div>
             </div>
           </div>
@@ -96,21 +108,27 @@
       </div>
 
       <!-- Toggle visibility by toggling the class -->
-
       <script>
         $(document).ready(function () {
+          $("#change-color").on("click", function () {
+            $("body, p, button, div, input").toggleClass("darkmode");
+            $("#mode-icon").toggleClass("img-yellow");
+          });
+
           $("body, p, button, div, input").toggleClass("darkmode");
           $("button, input, textarea").addClass("buttonhover");
 
-          $("#revealAstar, #revealDfs").on("click", function () {
-            $("#astar-container").toggleClass("d-none");
-            $("#dfs-container").toggleClass("d-none");
-          });
-        });
+          $("input[type='radio'][name='Alg_Option']").on("change", function () {
+            if ($("#revealAstar").is(":checked")) {
+              $("#dfs-container").addClass("d-none");
+              $("#astar-container").removeClass("d-none");
+            }
 
-        $("#change-color").on("click", function () {
-          $("body, p, button, div, input").toggleClass("darkmode");
-          $("#mode-icon").toggleClass("img-yellow");
+            if ($("#revealDfs").is(":checked")) {
+              $("#astar-container").addClass("d-none");
+              $("#dfs-container").removeClass("d-none");
+            }
+          });
         });
       </script>
     </main>
