@@ -165,11 +165,11 @@ function draw() {
 
   // Show visited and path points
   for (let i = 0; i < closedSet.length; i++) {
-    closedSet[i].show(color(255, 0, 0));
+    // closedSet[i].show(color(255, 0, 0));
   }
 
   for (let i = 0; i < openSet.length; i++) {
-    openSet[i].show(color(0, 255, 0));
+    // openSet[i].show(color(0, 255, 0));
   }
 
   path = [];
